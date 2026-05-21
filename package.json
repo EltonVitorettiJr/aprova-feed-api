@@ -1,0 +1,36 @@
+{
+  "name": "aprova-feed-api",
+  "version": "1.0.0",
+  "description": "API de uso do AprovaFeed. Módulo Bootcamp Extensionista - UNISAGRADO",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "tsx watch src/server.ts"
+  },
+  "keywords": [
+    "AprovaFeed",
+    "API",
+    "Bootcamp Extensionista",
+    "UNISAGRADO",
+    "Fastify"
+  ],
+  "authors": [
+    "Caio D. P. da Silva",
+    "Camily Ferreira",
+    "Elton A. V. Junior",
+    "Ryan M. M. dos Santos",
+    "Vanderlei Tortora Junior"
+  ],
+  "license": "ISC",
+  "type": "module",
+  "dependencies": {
+    "dotenv": "^17.4.2",
+    "fastify": "^5.8.5"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "2.4.15",
+    "@types/node": "^25.9.1",
+    "tsx": "^4.22.3",
+    "typescript": "^6.0.3"
+  }
+}
