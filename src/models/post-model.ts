@@ -1,7 +1,8 @@
-import { type Document, model, Schema, type Types } from "mongoose";
+import { type Document, model, Schema } from "mongoose";
 
 export interface IPost extends Document {
-  clientId: Types.ObjectId;
+  clientId: Schema.Types.ObjectId;
+  video_script: string;
   image_urls: string[];
   caption: string;
   scheduled_date: Date;
@@ -14,6 +15,10 @@ const postSchema = new Schema<IPost>(
     clientId: {
       type: Schema.Types.ObjectId,
       ref: "User", // Faz o relacionamento com a tabela de Users
+      required: true,
+    },
+    video_script: {
+      type: String,
       required: true,
     },
     image_urls: {
