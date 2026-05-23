@@ -18,6 +18,7 @@ export const googleLoginController = async (
   if (!email || !name) {
     return reply.status(400).send({ message: "Email and name are required" });
   }
+
   try {
     let user = await User.findOne({ email });
 
@@ -31,7 +32,7 @@ export const googleLoginController = async (
     }
 
     const token = await reply.jwtSign({
-      email: user.email,
+      userId: user._id,
       isAdmin: user.isAdmin,
     });
 
