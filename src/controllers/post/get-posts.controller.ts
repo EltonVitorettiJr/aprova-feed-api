@@ -16,16 +16,27 @@ export const getPostsController = async (
   request: FastifyRequest,
   reply: FastifyReply,
 ): Promise<GetPostsResponse[]> => {
+  const tokenData = request.user as { userId: ObjectId; isAdmin: boolean };
+
+  let filter = {};
+
+  if (!tokenData.isAdmin) {
+    filter = { clientId: tokenData.userId };
+  } else {
+    const { clientId } = request.query as { clientId: ObjectId };
+
+    if (clientId) {
+      filter = { clientId };
+    }
+  }
+
   try {
-    const { clientId } = request.query as { clientId?: ObjectId };
-
-    const filter = clientId ? { clientId } : {};
-
-    const posts = await Post.find(filter).sort({ createdAt: -1 });
+    const posts = await Post.find(filter).sort({ scheduled_date: 1 });
 
     return reply.status(200).send(posts);
   } catch (error) {
-    console.error("Error fetching posts:", error);
-    return reply.status(500).send({ message: "Error while fetching posts" });
+    return reply
+      .status(500)
+      .send({ message: `Error while fetching posts: ${error}` });
   }
 };

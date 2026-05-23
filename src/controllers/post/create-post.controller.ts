@@ -24,6 +24,12 @@ export const createPostController = async (
   request: FastifyRequest,
   reply: FastifyReply,
 ): Promise<CreatePostResponse> => {
+  const tokenData = request.user as { userId: ObjectId; isAdmin: boolean };
+
+  if (!tokenData.isAdmin) {
+    return reply.status(403).send({ message: "Only admins can create posts" });
+  }
+
   const data = request.body as CreatePostRequestBody;
 
   try {
@@ -37,8 +43,8 @@ export const createPostController = async (
 
     return reply.status(201).send(newPost);
   } catch (error) {
-    console.error("Error creating post:", error);
-
-    return reply.status(500).send({ message: "Error while creating post" });
+    return reply
+      .status(500)
+      .send({ message: `Error while creating post: ${error}` });
   }
 };

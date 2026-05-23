@@ -37,10 +37,8 @@ export const googleLoginController = async (
 
     return reply.status(200).send({ user, token });
   } catch (error) {
-    console.error("Error logging in with Google:", error);
-
     return reply
       .status(500)
-      .send({ message: "Error while logging in with Google" });
+      .send({ message: `Error while logging in with Google: ${error}` });
   }
 };
