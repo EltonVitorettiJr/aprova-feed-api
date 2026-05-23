@@ -1,6 +1,7 @@
 import type { FastifyReply, FastifyRequest } from "fastify";
 import type { ObjectId } from "mongoose";
 import { Post } from "../../models/post-model.js";
+import { User } from "../../models/user-model.js";
 
 interface GetPostsResponse {
   clientId?: ObjectId;
@@ -23,7 +24,7 @@ export const getPostsController = async (
     status: "PENDING" | "APPROVED" | "ADJUSTMENT_NEEDED";
   };
 
-  let filter = {};
+  let filter: Record<string, unknown> = {};
 
   if (!tokenData.isAdmin) {
     filter = { clientId: tokenData.userId };
@@ -38,7 +39,15 @@ export const getPostsController = async (
   }
 
   try {
-    const posts = await Post.find(filter).sort({ scheduled_date: 1 });
+    if (filter.clientId) {
+      const client = await User.findById(filter.clientId);
+
+      if (!client) {
+        return reply.status(404).send({ message: "Client not found" });
+      }
+    }
+
+    const posts = await Post.find(filter).sort({ scheduled_date: -1 });
 
     return reply.status(200).send(posts);
   } catch (error) {

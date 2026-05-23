@@ -9,32 +9,33 @@ export const uploadImageController = async (
 ) => {
   try {
     // Pega o arquivo enviado no formato multipart
-    const data = await request.file();
+    const files = await request.files();
+    const urls: string[] = [];
 
-    if (!data) {
-      return reply.status(400).send({ message: "Nenhuma imagem foi enviada." });
+    for await (const data of files) {
+      const extension = data.filename.split(".").pop(); // Pega a extensão do arquivo
+      const imageName = `${randomUUID()}.${extension}`; // Gera um nome único para o arquivo
+      const buffer = await data.toBuffer(); // Pega o buffer do arquivo
+
+      await minioClient.putObject(
+        BUCKET_NAME,
+        imageName,
+        buffer,
+        buffer.length,
+        {
+          "Content-Type": data.mimetype,
+        },
+      ); // Faz o upload do arquivo no MinIO
+      const imageUrl = `http://localhost:9000/${BUCKET_NAME}/${imageName}`; // Gera a URL da imagem
+
+      urls.push(imageUrl);
     }
 
-    // Gera um nome único para não sobrescrever fotos com o mesmo nome
-    const extension = data.filename.split(".").pop();
-    const fileName = `${randomUUID()}.${extension}`;
+    if (urls.length === 0) {
+      return reply.status(400).send({ message: "No images uploaded." });
+    }
 
-    // Transforma o stream de dados da imagem em um buffer
-    const buffer = await data.toBuffer();
-
-    // Faz o upload direto pro container do MinIO
-    await minioClient.putObject(
-      BUCKET_NAME,
-      fileName,
-      buffer, // O stream de dados da imagem
-      buffer.length,
-      { "Content-Type": data.mimetype }, // Avisa se é png, jpeg, etc
-    );
-
-    // Constrói a URL pública da imagem para você salvar no MongoDB depois!
-    const imageUrl = `http://localhost:9000/${BUCKET_NAME}/${fileName}`;
-
-    return reply.status(201).send({ url: imageUrl });
+    return reply.status(201).send({ urls });
   } catch (error) {
     console.error("Erro no upload:", error);
     return reply

@@ -1,7 +1,7 @@
-import { type Document, model, Schema } from "mongoose";
+import { type Document, model, Schema, type Types } from "mongoose";
 
 export interface IPost extends Document {
-  clientId: Schema.Types.ObjectId;
+  clientId: Types.ObjectId;
   video_script: string;
   image_urls: string[];
   caption: string;

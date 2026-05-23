@@ -1,12 +1,15 @@
 import type { FastifyReply, FastifyRequest } from "fastify";
 import type { ObjectId } from "mongoose";
+import z from "zod";
 import { Post } from "../../models/post-model.js";
 
 export const deletePostController = async (
   request: FastifyRequest,
   reply: FastifyReply,
 ) => {
-  const { postId } = request.params as { postId: ObjectId };
+  const paramsSchema = z.object({ postId: z.string() });
+
+  const { postId } = paramsSchema.parse(request.params);
 
   const tokenData = request.user as { userId: ObjectId; isAdmin: boolean };
 
