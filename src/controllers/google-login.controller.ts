@@ -18,6 +18,7 @@ export const googleLoginController = async (
   if (!email || !name) {
     return reply.status(400).send({ message: "Email and name are required" });
   }
+
   try {
     let user = await User.findOne({ email });
 
@@ -31,16 +32,14 @@ export const googleLoginController = async (
     }
 
     const token = await reply.jwtSign({
-      email: user.email,
+      userId: user._id,
       isAdmin: user.isAdmin,
     });
 
     return reply.status(200).send({ user, token });
   } catch (error) {
-    console.error("Error logging in with Google:", error);
-
     return reply
       .status(500)
-      .send({ message: "Error while logging in with Google" });
+      .send({ message: `Error while logging in with Google: ${error}` });
   }
 };

@@ -8,19 +8,23 @@ export const deletePostController = async (
 ) => {
   const { postId } = request.params as { postId: ObjectId };
 
+  const tokenData = request.user as { userId: ObjectId; isAdmin: boolean };
+
+  if (!tokenData.isAdmin) {
+    return reply.status(403).send({ message: "Only admins can delete posts" });
+  }
+
   try {
-    const post = await Post.findById(postId);
+    const post = await Post.findByIdAndDelete(postId);
 
     if (!post) {
       return reply.status(404).send({ message: "Post not found" });
     }
 
-    await Post.findByIdAndDelete(postId);
-
     return reply.status(200).send({ message: "Post deleted successfully" });
   } catch (error) {
-    console.error("Error deleting post:", error);
-
-    return reply.status(500).send({ message: "Error while deleting post" });
+    return reply
+      .status(500)
+      .send({ message: `Error while deleting post: ${error}` });
   }
 };
