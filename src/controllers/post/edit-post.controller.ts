@@ -36,6 +36,13 @@ export const editPostController = async (
           .send({ message: "Only admins can edit posts of other users" });
       }
 
+      // Remove os campos status e feedback do objeto data, pois eles podem ser editados apenas pelos admins
+      if (post.status !== "PENDING") {
+        return reply
+          .status(403)
+          .send({ message: "Only admins can edit posts that are not PENDING" });
+      }
+
       data = {
         status: data.status,
         feedback: data.feedback,

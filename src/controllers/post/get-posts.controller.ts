@@ -18,16 +18,23 @@ export const getPostsController = async (
 ): Promise<GetPostsResponse[]> => {
   const tokenData = request.user as { userId: ObjectId; isAdmin: boolean };
 
+  const { clientId, status } = request.query as {
+    clientId: ObjectId;
+    status: "PENDING" | "APPROVED" | "ADJUSTMENT_NEEDED";
+  };
+
   let filter = {};
 
   if (!tokenData.isAdmin) {
     filter = { clientId: tokenData.userId };
   } else {
-    const { clientId } = request.query as { clientId: ObjectId };
-
     if (clientId) {
       filter = { clientId };
     }
+  }
+
+  if (status) {
+    filter = { ...filter, status };
   }
 
   try {
